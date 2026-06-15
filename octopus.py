@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import requests
 
@@ -319,7 +319,7 @@ INDEX_HTML = """<!doctype html>
       const tariff = (status && status.active_tariff) || {};
       els.productName.textContent = tariff.product_name || tariff.product_code || "--";
       els.tariffCode.textContent = tariff.tariff_code || "--";
-      els.meterSerial.textContent = tariff.meter_serial || "--";
+      els.meterSerial.textContent = tariff.meter_serial || (tariff.meter_serials || []).join(", ") || "--";
     }
 
     function updateSummary(status) {
@@ -468,7 +468,8 @@ INDEX_HTML = """<!doctype html>
         } else if ((payload.consumption || []).length === 0 && payload.status && payload.status.active_tariff && payload.status.active_tariff.meter_serial) {
           const query = payload.status.last_consumption_query || {};
           const windowText = query.period_from && query.period_to ? ` from ${formatTime(query.period_from)} to ${formatTime(query.period_to)}` : "";
-          setStatus(`${els.status.textContent} No consumption data returned by Octopus yet for MPAN ${query.mpan || payload.status.active_tariff.mpan || "--"} meter ${query.meter_serial || payload.status.active_tariff.meter_serial}${windowText}.`, "warn");
+          const serialText = (query.tried_serials || [query.meter_serial || payload.status.active_tariff.meter_serial]).filter(Boolean).join(", ");
+          setStatus(`${els.status.textContent} No consumption data returned by Octopus yet for MPAN ${query.mpan || payload.status.active_tariff.mpan || "--"} meter ${serialText || "--"}${windowText}.`, "warn");
         } else if (payload.status && payload.status.last_comparison_error) {
           setStatus(`${els.status.textContent} Some comparison tariffs could not be read: ${payload.status.last_comparison_error}`, "warn");
         }
@@ -665,13 +666,19 @@ def find_current_electricity_tariff(account_data):
     raise RuntimeError("No active import electricity tariff was found on this account")
 
 
-def meter_serial_for_point(meter_point):
+def meter_serials_for_point(meter_point):
     meters = meter_point.get("meters") or []
+    serials = []
     for meter in meters:
         serial = meter.get("serial_number") or meter.get("serial")
-        if serial:
-            return serial
-    return None
+        if serial and serial not in serials:
+            serials.append(serial)
+    return serials
+
+
+def meter_serial_for_point(meter_point):
+    serials = meter_serials_for_point(meter_point)
+    return serials[0] if serials else None
 
 
 def rate_endpoints_for_tariff(tariff_code):
@@ -689,7 +696,10 @@ def price_url(product_code, tariff_code, endpoint):
 
 
 def consumption_url(mpan, meter_serial):
-    return f"{API_BASE}/electricity-meter-points/{mpan}/meters/{meter_serial}/consumption/"
+    return (
+        f"{API_BASE}/electricity-meter-points/{quote(str(mpan), safe='')}/"
+        f"meters/{quote(str(meter_serial), safe='')}/consumption/"
+    )
 
 
 def fetch_product_detail(product_code):
@@ -779,6 +789,7 @@ def resolve_account_tariff(config=None):
     product_code = product_code_from_tariff(tariff_code)
     product = fetch_product_summary(product_code)
     rate_name, endpoint = rate_endpoints_for_tariff(tariff_code)[0]
+    meter_serials = meter_serials_for_point(meter_point)
 
     return {
         "account_number": account.get("number") or config["account_number"],
@@ -786,7 +797,8 @@ def resolve_account_tariff(config=None):
         "property_id": prop.get("id"),
         "postcode": prop.get("postcode"),
         "mpan": meter_point.get("mpan"),
-        "meter_serial": meter_serial_for_point(meter_point),
+        "meter_serial": meter_serials[0] if meter_serials else None,
+        "meter_serials": meter_serials,
         "product_code": product_code,
         "product_name": product["product_name"],
         "product_full_name": product.get("product_full_name"),
@@ -867,6 +879,14 @@ def consumption_sample(tariff, row):
     }
 
 
+def consumption_period():
+    now = utc_now()
+    return (
+        (now - timedelta(days=31)).isoformat().replace("+00:00", "Z"),
+        now.isoformat().replace("+00:00", "Z"),
+    )
+
+
 def merge_consumption(existing, incoming):
     merged = {}
     for row in existing + incoming:
@@ -880,32 +900,48 @@ def merge_consumption(existing, incoming):
 
 def fetch_consumption_for_tariff(tariff, api_key):
     mpan = tariff.get("mpan")
-    meter_serial = tariff.get("meter_serial")
-    if not mpan or not meter_serial or not api_key:
+    meter_serials = tariff.get("meter_serials") or []
+    if tariff.get("meter_serial") and tariff.get("meter_serial") not in meter_serials:
+        meter_serials.insert(0, tariff.get("meter_serial"))
+    if not mpan or not meter_serials or not api_key:
         COLLECTOR_STATE["last_consumption_query"] = {
             "mpan": mpan,
-            "meter_serial": meter_serial,
+            "meter_serial": tariff.get("meter_serial"),
+            "tried_serials": meter_serials,
             "period_from": None,
             "period_to": None,
             "rows": 0,
+            "rows_by_serial": {},
         }
         return []
 
-    now = utc_now()
-    period_from = (now - timedelta(days=31)).isoformat().replace("+00:00", "Z")
-    period_to = now.isoformat().replace("+00:00", "Z")
-    data = octopus_get(
-        consumption_url(mpan, meter_serial),
-        api_key=api_key,
-        params={"period_from": period_from, "period_to": period_to, "order_by": "period"},
-    )
-    rows = data.get("results", [])
+    period_from, period_to = consumption_period()
+    rows_by_serial = {}
+    last_rows = []
+
+    for meter_serial in meter_serials:
+        data = octopus_get(
+            consumption_url(mpan, meter_serial),
+            api_key=api_key,
+            params={"period_from": period_from, "period_to": period_to, "order_by": "period"},
+        )
+        rows = data.get("results", [])
+        rows_by_serial[meter_serial] = len(rows)
+        last_rows = rows
+        if rows:
+            tariff["meter_serial"] = meter_serial
+            break
+    else:
+        rows = last_rows
+
     COLLECTOR_STATE["last_consumption_query"] = {
         "mpan": mpan,
-        "meter_serial": meter_serial,
+        "meter_serial": tariff.get("meter_serial"),
+        "tried_serials": meter_serials,
         "period_from": period_from,
         "period_to": period_to,
         "rows": len(rows),
+        "rows_by_serial": rows_by_serial,
     }
     return [consumption_sample(tariff, row) for row in rows if row.get("consumption") is not None]
 
@@ -944,6 +980,7 @@ def fetch_all_current_prices(config=None):
     COLLECTOR_STATE["last_comparison_error"] = "; ".join(comparison_errors[:5]) if comparison_errors else None
     try:
         consumption = fetch_consumption_for_tariff(active_tariff, config.get("api_key"))
+        COLLECTOR_STATE["active_tariff"]["meter_serial"] = active_tariff.get("meter_serial")
         COLLECTOR_STATE["last_consumption_error"] = None
     except Exception as exc:
         consumption = []
@@ -951,9 +988,11 @@ def fetch_all_current_prices(config=None):
         COLLECTOR_STATE["last_consumption_query"] = {
             "mpan": active_tariff.get("mpan"),
             "meter_serial": active_tariff.get("meter_serial"),
+            "tried_serials": active_tariff.get("meter_serials") or [active_tariff.get("meter_serial")],
             "period_from": None,
             "period_to": None,
             "rows": 0,
+            "rows_by_serial": {},
         }
 
     return active_samples[0], samples, consumption
