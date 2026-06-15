@@ -507,7 +507,7 @@ def read_json_file(path, default):
     if not path.exists():
         return default
 
-    with path.open("r", encoding="utf-8") as file:
+    with path.open("r", encoding="utf-8-sig") as file:
         return json.load(file)
 
 
