@@ -223,6 +223,7 @@ INDEX_HTML = """<!doctype html>
       <div class="metric"><span>Current price</span><strong id="currentPrice">--</strong></div>
       <div class="metric"><span>Actual product</span><strong id="productName">--</strong></div>
       <div class="metric"><span>Tariff code</span><strong id="tariffCode">--</strong></div>
+      <div class="metric"><span>Meter serial</span><strong id="meterSerial">--</strong></div>
       <div class="metric"><span>Latest sample</span><strong id="latestSample">--</strong></div>
       <div class="metric"><span>Samples</span><strong id="sampleCount">0</strong></div>
       <div class="metric"><span>Collector</span><strong id="collectorState">--</strong></div>
@@ -277,6 +278,7 @@ INDEX_HTML = """<!doctype html>
       collectorState: document.getElementById("collectorState"),
       productName: document.getElementById("productName"),
       tariffCode: document.getElementById("tariffCode"),
+      meterSerial: document.getElementById("meterSerial"),
       accountForm: document.getElementById("accountForm"),
       accountNumber: document.getElementById("accountNumber"),
       apiKey: document.getElementById("apiKey")
@@ -316,6 +318,7 @@ INDEX_HTML = """<!doctype html>
       const tariff = (status && status.active_tariff) || {};
       els.productName.textContent = tariff.product_name || tariff.product_code || "--";
       els.tariffCode.textContent = tariff.tariff_code || "--";
+      els.meterSerial.textContent = tariff.meter_serial || "--";
     }
 
     function updateSummary(status) {
