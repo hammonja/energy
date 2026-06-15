@@ -628,6 +628,23 @@ def octopus_get(url, api_key=None, params=None):
     return response.json()
 
 
+def octopus_get_all_results(url, api_key=None, params=None):
+    auth = (api_key, "") if api_key else None
+    next_url = url
+    next_params = dict(params or {})
+    results = []
+
+    while next_url:
+        response = requests.get(next_url, auth=auth, params=next_params, timeout=20)
+        response.raise_for_status()
+        payload = response.json()
+        results.extend(payload.get("results", []))
+        next_url = payload.get("next")
+        next_params = None
+
+    return results
+
+
 def product_code_from_tariff(tariff_code):
     parts = tariff_code.split("-")
     if len(parts) < 5:
@@ -920,12 +937,16 @@ def fetch_consumption_for_tariff(tariff, api_key):
     last_rows = []
 
     for meter_serial in meter_serials:
-        data = octopus_get(
+        rows = octopus_get_all_results(
             consumption_url(mpan, meter_serial),
             api_key=api_key,
-            params={"period_from": period_from, "period_to": period_to, "order_by": "period"},
+            params={
+                "period_from": period_from,
+                "period_to": period_to,
+                "order_by": "period",
+                "page_size": 25000,
+            },
         )
-        rows = data.get("results", [])
         rows_by_serial[meter_serial] = len(rows)
         last_rows = rows
         if rows:
