@@ -29,6 +29,7 @@ COLLECTOR_STATE = {
     "last_ok": None,
     "last_error": None,
     "last_comparison_error": None,
+    "last_consumption_error": None,
     "last_attempt": None,
     "account_linked": False,
     "active_tariff": None,
@@ -263,6 +264,7 @@ INDEX_HTML = """<!doctype html>
     };
 
     let allSamples = [];
+    let allConsumption = [];
     let latestStatus = {};
     let activeRange = "all";
 
@@ -294,6 +296,12 @@ INDEX_HTML = """<!doctype html>
       return allSamples.filter(point => new Date(point.collected_at).getTime() >= cutoff);
     }
 
+    function rangeConsumption() {
+      if (activeRange === "all") return allConsumption;
+      const cutoff = Date.now() - ranges[activeRange];
+      return allConsumption.filter(point => new Date(point.interval_start).getTime() >= cutoff);
+    }
+
     function setStatus(text, kind = "") {
       els.status.textContent = text;
       els.status.className = `status ${kind}`.trim();
@@ -318,13 +326,14 @@ INDEX_HTML = """<!doctype html>
       const latest = (accountSamples.length ? accountSamples : allSamples).at(-1);
       els.currentPrice.textContent = latest ? `${latest.value_inc_vat.toFixed(2)} p/kWh` : "--";
       els.latestSample.textContent = latest ? formatTime(latest.collected_at) : "--";
-      els.sampleCount.textContent = allSamples.length.toLocaleString();
+      els.sampleCount.textContent = `${allSamples.length.toLocaleString()} prices / ${allConsumption.length.toLocaleString()} usage`;
       els.collectorState.textContent = status.last_error ? "Error" : (status.last_ok ? "Running" : "Starting");
       els.collectorState.style.color = status.last_error ? "var(--bad)" : "var(--good)";
     }
 
     function drawChart() {
       const samples = rangeSamples();
+      const consumption = rangeConsumption();
       const activeTariffCode = latestStatus.active_tariff && latestStatus.active_tariff.tariff_code;
       const comparisonColours = [
         "#c9d8ff",
@@ -343,7 +352,19 @@ INDEX_HTML = """<!doctype html>
         groups.get(key).push(point);
       }
 
-      const traces = Array.from(groups.entries()).map(([key, points], index) => {
+      const consumptionTrace = {
+        x: consumption.map(point => new Date(point.interval_start)),
+        y: consumption.map(point => point.consumption_kwh),
+        customdata: consumption.map(point => [point.interval_end || "", point.meter_serial || ""]),
+        type: "bar",
+        name: "Actual consumption",
+        yaxis: "y2",
+        marker: { color: "rgba(114, 82, 163, 0.26)", line: { color: "rgba(114, 82, 163, 0.55)", width: 1 } },
+        width: 28 * 60 * 1000,
+        hovertemplate: "%{x|%d %b %Y %H:%M}<br>%{y:.3f} kWh<br>to %{customdata[0]}<extra></extra>"
+      };
+
+      const priceTraces = Array.from(groups.entries()).map(([key, points], index) => {
         const first = points[0] || {};
         const isActive = first.tariff_code === activeTariffCode || first.account_linked;
         const colour = isActive ? "#0078a8" : comparisonColours[index % comparisonColours.length];
@@ -370,6 +391,7 @@ INDEX_HTML = """<!doctype html>
           hovertemplate: "%{x|%d %b %Y %H:%M}<br>%{y:.2f} p/kWh<br>%{customdata[1]}<br>%{customdata[0]}<br>%{customdata[2]}<extra></extra>"
         };
       });
+      const traces = consumption.length ? [consumptionTrace, ...priceTraces] : priceTraces;
 
       const rootStyle = getComputedStyle(document.documentElement);
       const layout = {
@@ -396,6 +418,15 @@ INDEX_HTML = """<!doctype html>
           zeroline: true,
           gridcolor: rootStyle.getPropertyValue("--line").trim()
         },
+        yaxis2: {
+          title: "kWh",
+          overlaying: "y",
+          side: "right",
+          zeroline: true,
+          gridcolor: "rgba(0,0,0,0)",
+          rangemode: "tozero"
+        },
+        barmode: "overlay",
         hovermode: "x unified",
         showlegend: true,
         legend: { orientation: "h", y: -0.25 }
@@ -421,12 +452,15 @@ INDEX_HTML = """<!doctype html>
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const payload = await response.json();
         allSamples = payload.samples || [];
+        allConsumption = payload.consumption || [];
         latestStatus = payload.status || {};
         updateAccount(payload.config || {}, payload.status || {});
         updateSummary(payload.status || {});
         drawChart();
         if (payload.status && payload.status.last_error) {
           setStatus(`${els.status.textContent} Last collector error: ${payload.status.last_error}`, "error");
+        } else if (payload.status && payload.status.last_consumption_error) {
+          setStatus(`${els.status.textContent} Consumption unavailable: ${payload.status.last_consumption_error}`, "warn");
         } else if (payload.status && payload.status.last_comparison_error) {
           setStatus(`${els.status.textContent} Some comparison tariffs could not be read: ${payload.status.last_comparison_error}`, "warn");
         }
@@ -453,6 +487,7 @@ INDEX_HTML = """<!doctype html>
         if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
         els.apiKey.value = "";
         allSamples = payload.samples || allSamples;
+        allConsumption = payload.consumption || allConsumption;
         latestStatus = payload.status || latestStatus;
         updateAccount(payload.config || {}, payload.status || {});
         updateSummary(payload.status || {});
@@ -520,13 +555,23 @@ def read_samples():
     return data.get("samples", [])
 
 
-def write_samples(samples, source_url, active_tariff):
+def read_consumption():
+    data = read_json_file(DATA_FILE, [])
+
+    if isinstance(data, list):
+        return []
+
+    return data.get("consumption", [])
+
+
+def write_samples(samples, source_url, active_tariff, consumption=None):
     payload = {
         "updated_at": local_now_iso(),
         "source_url": source_url,
         "poll_seconds": POLL_SECONDS,
         "active_tariff": active_tariff,
         "samples": samples,
+        "consumption": consumption if consumption is not None else read_consumption(),
     }
     temp_file = DATA_FILE.with_suffix(DATA_FILE.suffix + ".tmp")
     with temp_file.open("w", encoding="utf-8") as file:
@@ -612,6 +657,15 @@ def find_current_electricity_tariff(account_data):
     raise RuntimeError("No active import electricity tariff was found on this account")
 
 
+def meter_serial_for_point(meter_point):
+    meters = meter_point.get("meters") or []
+    for meter in meters:
+        serial = meter.get("serial_number") or meter.get("serial")
+        if serial:
+            return serial
+    return None
+
+
 def rate_endpoints_for_tariff(tariff_code):
     if tariff_code.startswith("E-2R-"):
         return [
@@ -624,6 +678,10 @@ def rate_endpoints_for_tariff(tariff_code):
 
 def price_url(product_code, tariff_code, endpoint):
     return f"{API_BASE}/products/{product_code}/electricity-tariffs/{tariff_code}/{endpoint}/"
+
+
+def consumption_url(mpan, meter_serial):
+    return f"{API_BASE}/electricity-meter-points/{mpan}/meters/{meter_serial}/consumption/"
 
 
 def fetch_product_detail(product_code):
@@ -720,6 +778,7 @@ def resolve_account_tariff(config=None):
         "property_id": prop.get("id"),
         "postcode": prop.get("postcode"),
         "mpan": meter_point.get("mpan"),
+        "meter_serial": meter_serial_for_point(meter_point),
         "product_code": product_code,
         "product_name": product["product_name"],
         "product_full_name": product.get("product_full_name"),
@@ -787,6 +846,47 @@ def fetch_current_price_for_tariff(tariff):
     return fetch_current_prices_for_tariff(tariff)[0]
 
 
+def consumption_sample(tariff, row):
+    interval_start = row.get("interval_start")
+    interval_end = row.get("interval_end")
+    return {
+        "interval_start": interval_start,
+        "interval_end": interval_end,
+        "consumption_kwh": float(row["consumption"]),
+        "mpan": tariff.get("mpan"),
+        "meter_serial": tariff.get("meter_serial"),
+        "collected_at": local_now_iso(),
+    }
+
+
+def merge_consumption(existing, incoming):
+    merged = {}
+    for row in existing + incoming:
+        key = (row.get("mpan"), row.get("meter_serial"), row.get("interval_start"), row.get("interval_end"))
+        merged[key] = row
+    return sorted(
+        merged.values(),
+        key=lambda row: parse_octopus_time(row["interval_start"]) if row.get("interval_start") else datetime.min.replace(tzinfo=timezone.utc),
+    )
+
+
+def fetch_consumption_for_tariff(tariff, api_key):
+    mpan = tariff.get("mpan")
+    meter_serial = tariff.get("meter_serial")
+    if not mpan or not meter_serial or not api_key:
+        return []
+
+    now = utc_now()
+    period_from = (now - timedelta(days=31)).isoformat().replace("+00:00", "Z")
+    period_to = (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z")
+    data = octopus_get(
+        consumption_url(mpan, meter_serial),
+        api_key=api_key,
+        params={"period_from": period_from, "period_to": period_to, "order_by": "period"},
+    )
+    return [consumption_sample(tariff, row) for row in data.get("results", []) if row.get("consumption") is not None]
+
+
 def fetch_current_price():
     tariff = resolve_account_tariff()
     COLLECTOR_STATE["account_linked"] = tariff.get("account_linked", False)
@@ -796,8 +896,9 @@ def fetch_current_price():
     return fetch_current_price_for_tariff(tariff)
 
 
-def fetch_all_current_prices():
-    active_tariff = resolve_account_tariff()
+def fetch_all_current_prices(config=None):
+    config = config or load_config()
+    active_tariff = resolve_account_tariff(config)
     active_tariff["account_linked"] = active_tariff.get("account_linked", False)
     COLLECTOR_STATE["account_linked"] = active_tariff.get("account_linked", False)
     COLLECTOR_STATE["active_tariff"] = {
@@ -818,18 +919,26 @@ def fetch_all_current_prices():
             comparison_errors.append(f"{tariff['tariff_code']}: {exc}")
 
     COLLECTOR_STATE["last_comparison_error"] = "; ".join(comparison_errors[:5]) if comparison_errors else None
-    return active_samples[0], samples
+    try:
+        consumption = fetch_consumption_for_tariff(active_tariff, config.get("api_key"))
+        COLLECTOR_STATE["last_consumption_error"] = None
+    except Exception as exc:
+        consumption = []
+        COLLECTOR_STATE["last_consumption_error"] = str(exc)
+
+    return active_samples[0], samples, consumption
 
 
 def collect_once():
     COLLECTOR_STATE["last_attempt"] = local_now_iso()
-    sample, batch = fetch_all_current_prices()
+    sample, batch, consumption_batch = fetch_all_current_prices()
 
     with DATA_LOCK:
         samples = read_samples()
         samples.extend(batch)
         samples.sort(key=lambda point: parse_octopus_time(point["collected_at"]))
-        write_samples(samples, sample["price_url"], COLLECTOR_STATE["active_tariff"])
+        consumption = merge_consumption(read_consumption(), consumption_batch)
+        write_samples(samples, sample["price_url"], COLLECTOR_STATE["active_tariff"], consumption)
 
     COLLECTOR_STATE["last_ok"] = sample["collected_at"]
     COLLECTOR_STATE["last_error"] = None
@@ -888,9 +997,11 @@ class OctopusHandler(BaseHTTPRequestHandler):
         if path == "/api/prices":
             with DATA_LOCK:
                 samples = read_samples()
+                consumption = read_consumption()
             self.send_json(
                 {
                     "samples": samples,
+                    "consumption": consumption,
                     "status": COLLECTOR_STATE,
                     "config": public_config(),
                 }
@@ -925,12 +1036,14 @@ class OctopusHandler(BaseHTTPRequestHandler):
                 sample = collect_once()
                 with DATA_LOCK:
                     samples = read_samples()
+                    consumption = read_consumption()
                 self.send_json(
                     {
                         "config": public_config(config),
                         "status": COLLECTOR_STATE,
                         "sample": sample,
                         "samples": samples,
+                        "consumption": consumption,
                     }
                 )
             except Exception as exc:
@@ -941,7 +1054,16 @@ class OctopusHandler(BaseHTTPRequestHandler):
         if path == "/api/collect":
             try:
                 sample = collect_once()
-                self.send_json({"sample": sample, "status": COLLECTOR_STATE, "config": public_config()})
+                with DATA_LOCK:
+                    consumption = read_consumption()
+                self.send_json(
+                    {
+                        "sample": sample,
+                        "consumption": consumption,
+                        "status": COLLECTOR_STATE,
+                        "config": public_config(),
+                    }
+                )
             except Exception as exc:
                 COLLECTOR_STATE["last_error"] = str(exc)
                 self.send_json({"error": str(exc), "status": COLLECTOR_STATE}, HTTPStatus.BAD_GATEWAY)
