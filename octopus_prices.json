@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-15T17:15:12+01:00",
+  "updated_at": "2026-06-15T17:17:31+01:00",
   "source_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-H/standard-unit-rates/",
   "poll_seconds": 300,
   "active_tariff": {
@@ -8,7 +8,11 @@
     "property_id": 3830196,
     "postcode": "RG40 2LH",
     "mpan": "2000005457590",
-    "meter_serial": "Z14N131482",
+    "meter_serial": "23E5031404",
+    "meter_serials": [
+      "Z14N131482",
+      "23E5031404"
+    ],
     "product_code": "INTELLI-VAR-24-10-29",
     "product_name": "Intelligent Octopus Go",
     "product_full_name": "Intelligent Octopus Go",
@@ -4240,7 +4244,1060 @@
       "tariff_display_name": null,
       "rate_name": "standard",
       "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-P/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:28+01:00",
+      "value_inc_vat": 30.371355,
+      "value_exc_vat": 28.9251,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": "A-48780D75",
+      "account_linked": true,
+      "mpan": "2000005457590",
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-H",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-H/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:28+01:00",
+      "value_inc_vat": 30.268665,
+      "value_exc_vat": 28.8273,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-A",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-A/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:28+01:00",
+      "value_inc_vat": 28.557165,
+      "value_exc_vat": 27.1973,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-B",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-B/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 30.085965,
+      "value_exc_vat": 28.6533,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-C",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-C/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 31.333995,
+      "value_exc_vat": 29.8419,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-D",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-D/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 28.86387,
+      "value_exc_vat": 27.4894,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-E",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-E/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 28.854525,
+      "value_exc_vat": 27.4805,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-F",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-F/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 29.804355,
+      "value_exc_vat": 28.3851,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-G",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-G/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 30.464805,
+      "value_exc_vat": 29.0141,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-J",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-J/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 30.06129,
+      "value_exc_vat": 28.6298,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-K",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-K/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 30.256905,
+      "value_exc_vat": 28.8161,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-L",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-L/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:29+01:00",
+      "value_inc_vat": 28.58436,
+      "value_exc_vat": 27.2232,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-M",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-M/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:30+01:00",
+      "value_inc_vat": 28.98672,
+      "value_exc_vat": 27.6064,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-N",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-N/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T17:17:30+01:00",
+      "value_inc_vat": 30.005535,
+      "value_exc_vat": 28.5767,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-P",
+      "tariff_display_name": null,
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-P/standard-unit-rates/"
     }
   ],
-  "consumption": []
+  "consumption": [
+    {
+      "interval_start": "2026-05-15T17:30:00+01:00",
+      "interval_end": "2026-05-15T18:00:00+01:00",
+      "consumption_kwh": 0.344,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T18:00:00+01:00",
+      "interval_end": "2026-05-15T18:30:00+01:00",
+      "consumption_kwh": 0.238,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T18:30:00+01:00",
+      "interval_end": "2026-05-15T19:00:00+01:00",
+      "consumption_kwh": 0.258,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T19:00:00+01:00",
+      "interval_end": "2026-05-15T19:30:00+01:00",
+      "consumption_kwh": 0.3,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T19:30:00+01:00",
+      "interval_end": "2026-05-15T20:00:00+01:00",
+      "consumption_kwh": 1.754,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T20:00:00+01:00",
+      "interval_end": "2026-05-15T20:30:00+01:00",
+      "consumption_kwh": 1.551,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T20:30:00+01:00",
+      "interval_end": "2026-05-15T21:00:00+01:00",
+      "consumption_kwh": 0.384,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T21:00:00+01:00",
+      "interval_end": "2026-05-15T21:30:00+01:00",
+      "consumption_kwh": 0.282,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T21:30:00+01:00",
+      "interval_end": "2026-05-15T22:00:00+01:00",
+      "consumption_kwh": 0.275,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T22:00:00+01:00",
+      "interval_end": "2026-05-15T22:30:00+01:00",
+      "consumption_kwh": 0.313,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T22:30:00+01:00",
+      "interval_end": "2026-05-15T23:00:00+01:00",
+      "consumption_kwh": 1.771,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T23:00:00+01:00",
+      "interval_end": "2026-05-15T23:30:00+01:00",
+      "consumption_kwh": 0.813,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-15T23:30:00+01:00",
+      "interval_end": "2026-05-16T00:00:00+01:00",
+      "consumption_kwh": 0.135,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T00:00:00+01:00",
+      "interval_end": "2026-05-16T00:30:00+01:00",
+      "consumption_kwh": 0.104,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T00:30:00+01:00",
+      "interval_end": "2026-05-16T01:00:00+01:00",
+      "consumption_kwh": 0.112,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T01:00:00+01:00",
+      "interval_end": "2026-05-16T01:30:00+01:00",
+      "consumption_kwh": 0.093,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T01:30:00+01:00",
+      "interval_end": "2026-05-16T02:00:00+01:00",
+      "consumption_kwh": 0.081,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T02:00:00+01:00",
+      "interval_end": "2026-05-16T02:30:00+01:00",
+      "consumption_kwh": 0.076,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T02:30:00+01:00",
+      "interval_end": "2026-05-16T03:00:00+01:00",
+      "consumption_kwh": 0.077,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T03:00:00+01:00",
+      "interval_end": "2026-05-16T03:30:00+01:00",
+      "consumption_kwh": 0.08,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T03:30:00+01:00",
+      "interval_end": "2026-05-16T04:00:00+01:00",
+      "consumption_kwh": 0.07,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T04:00:00+01:00",
+      "interval_end": "2026-05-16T04:30:00+01:00",
+      "consumption_kwh": 0.088,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T04:30:00+01:00",
+      "interval_end": "2026-05-16T05:00:00+01:00",
+      "consumption_kwh": 0.093,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T05:00:00+01:00",
+      "interval_end": "2026-05-16T05:30:00+01:00",
+      "consumption_kwh": 0.101,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T05:30:00+01:00",
+      "interval_end": "2026-05-16T06:00:00+01:00",
+      "consumption_kwh": 0.151,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T06:00:00+01:00",
+      "interval_end": "2026-05-16T06:30:00+01:00",
+      "consumption_kwh": 0.138,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T06:30:00+01:00",
+      "interval_end": "2026-05-16T07:00:00+01:00",
+      "consumption_kwh": 0.124,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T07:00:00+01:00",
+      "interval_end": "2026-05-16T07:30:00+01:00",
+      "consumption_kwh": 0.124,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T07:30:00+01:00",
+      "interval_end": "2026-05-16T08:00:00+01:00",
+      "consumption_kwh": 0.17,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T08:00:00+01:00",
+      "interval_end": "2026-05-16T08:30:00+01:00",
+      "consumption_kwh": 0.168,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T08:30:00+01:00",
+      "interval_end": "2026-05-16T09:00:00+01:00",
+      "consumption_kwh": 0.11,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T09:00:00+01:00",
+      "interval_end": "2026-05-16T09:30:00+01:00",
+      "consumption_kwh": 0.1,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T09:30:00+01:00",
+      "interval_end": "2026-05-16T10:00:00+01:00",
+      "consumption_kwh": 0.095,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T10:00:00+01:00",
+      "interval_end": "2026-05-16T10:30:00+01:00",
+      "consumption_kwh": 0.101,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T10:30:00+01:00",
+      "interval_end": "2026-05-16T11:00:00+01:00",
+      "consumption_kwh": 0.097,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T11:00:00+01:00",
+      "interval_end": "2026-05-16T11:30:00+01:00",
+      "consumption_kwh": 0.201,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T11:30:00+01:00",
+      "interval_end": "2026-05-16T12:00:00+01:00",
+      "consumption_kwh": 0.205,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T12:00:00+01:00",
+      "interval_end": "2026-05-16T12:30:00+01:00",
+      "consumption_kwh": 0.16,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T12:30:00+01:00",
+      "interval_end": "2026-05-16T13:00:00+01:00",
+      "consumption_kwh": 0.609,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T13:00:00+01:00",
+      "interval_end": "2026-05-16T13:30:00+01:00",
+      "consumption_kwh": 0.492,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T13:30:00+01:00",
+      "interval_end": "2026-05-16T14:00:00+01:00",
+      "consumption_kwh": 0.212,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T14:00:00+01:00",
+      "interval_end": "2026-05-16T14:30:00+01:00",
+      "consumption_kwh": 0.29,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T14:30:00+01:00",
+      "interval_end": "2026-05-16T15:00:00+01:00",
+      "consumption_kwh": 0.151,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T15:00:00+01:00",
+      "interval_end": "2026-05-16T15:30:00+01:00",
+      "consumption_kwh": 0.114,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T15:30:00+01:00",
+      "interval_end": "2026-05-16T16:00:00+01:00",
+      "consumption_kwh": 0.1,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T16:00:00+01:00",
+      "interval_end": "2026-05-16T16:30:00+01:00",
+      "consumption_kwh": 0.103,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T16:30:00+01:00",
+      "interval_end": "2026-05-16T17:00:00+01:00",
+      "consumption_kwh": 0.229,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T17:00:00+01:00",
+      "interval_end": "2026-05-16T17:30:00+01:00",
+      "consumption_kwh": 0.155,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T17:30:00+01:00",
+      "interval_end": "2026-05-16T18:00:00+01:00",
+      "consumption_kwh": 0.26,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T18:00:00+01:00",
+      "interval_end": "2026-05-16T18:30:00+01:00",
+      "consumption_kwh": 0.26,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T18:30:00+01:00",
+      "interval_end": "2026-05-16T19:00:00+01:00",
+      "consumption_kwh": 0.243,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T19:00:00+01:00",
+      "interval_end": "2026-05-16T19:30:00+01:00",
+      "consumption_kwh": 0.278,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T19:30:00+01:00",
+      "interval_end": "2026-05-16T20:00:00+01:00",
+      "consumption_kwh": 0.804,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T20:00:00+01:00",
+      "interval_end": "2026-05-16T20:30:00+01:00",
+      "consumption_kwh": 0.491,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T20:30:00+01:00",
+      "interval_end": "2026-05-16T21:00:00+01:00",
+      "consumption_kwh": 0.215,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T21:00:00+01:00",
+      "interval_end": "2026-05-16T21:30:00+01:00",
+      "consumption_kwh": 0.324,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T21:30:00+01:00",
+      "interval_end": "2026-05-16T22:00:00+01:00",
+      "consumption_kwh": 0.336,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T22:00:00+01:00",
+      "interval_end": "2026-05-16T22:30:00+01:00",
+      "consumption_kwh": 0.906,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T22:30:00+01:00",
+      "interval_end": "2026-05-16T23:00:00+01:00",
+      "consumption_kwh": 1.082,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T23:00:00+01:00",
+      "interval_end": "2026-05-16T23:30:00+01:00",
+      "consumption_kwh": 0.354,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-16T23:30:00+01:00",
+      "interval_end": "2026-05-17T00:00:00+01:00",
+      "consumption_kwh": 0.128,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T00:00:00+01:00",
+      "interval_end": "2026-05-17T00:30:00+01:00",
+      "consumption_kwh": 0.117,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T00:30:00+01:00",
+      "interval_end": "2026-05-17T01:00:00+01:00",
+      "consumption_kwh": 0.114,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T01:00:00+01:00",
+      "interval_end": "2026-05-17T01:30:00+01:00",
+      "consumption_kwh": 0.104,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T01:30:00+01:00",
+      "interval_end": "2026-05-17T02:00:00+01:00",
+      "consumption_kwh": 0.104,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T02:00:00+01:00",
+      "interval_end": "2026-05-17T02:30:00+01:00",
+      "consumption_kwh": 0.169,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T02:30:00+01:00",
+      "interval_end": "2026-05-17T03:00:00+01:00",
+      "consumption_kwh": 0.116,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T03:00:00+01:00",
+      "interval_end": "2026-05-17T03:30:00+01:00",
+      "consumption_kwh": 0.089,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T03:30:00+01:00",
+      "interval_end": "2026-05-17T04:00:00+01:00",
+      "consumption_kwh": 0.093,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T04:00:00+01:00",
+      "interval_end": "2026-05-17T04:30:00+01:00",
+      "consumption_kwh": 0.076,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T04:30:00+01:00",
+      "interval_end": "2026-05-17T05:00:00+01:00",
+      "consumption_kwh": 0.098,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T05:00:00+01:00",
+      "interval_end": "2026-05-17T05:30:00+01:00",
+      "consumption_kwh": 0.107,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T05:30:00+01:00",
+      "interval_end": "2026-05-17T06:00:00+01:00",
+      "consumption_kwh": 0.152,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T06:00:00+01:00",
+      "interval_end": "2026-05-17T06:30:00+01:00",
+      "consumption_kwh": 0.156,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T06:30:00+01:00",
+      "interval_end": "2026-05-17T07:00:00+01:00",
+      "consumption_kwh": 0.138,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T07:00:00+01:00",
+      "interval_end": "2026-05-17T07:30:00+01:00",
+      "consumption_kwh": 0.199,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T07:30:00+01:00",
+      "interval_end": "2026-05-17T08:00:00+01:00",
+      "consumption_kwh": 0.148,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T08:00:00+01:00",
+      "interval_end": "2026-05-17T08:30:00+01:00",
+      "consumption_kwh": 0.108,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T08:30:00+01:00",
+      "interval_end": "2026-05-17T09:00:00+01:00",
+      "consumption_kwh": 0.101,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T09:00:00+01:00",
+      "interval_end": "2026-05-17T09:30:00+01:00",
+      "consumption_kwh": 0.079,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T09:30:00+01:00",
+      "interval_end": "2026-05-17T10:00:00+01:00",
+      "consumption_kwh": 0.09,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T10:00:00+01:00",
+      "interval_end": "2026-05-17T10:30:00+01:00",
+      "consumption_kwh": 0.102,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T10:30:00+01:00",
+      "interval_end": "2026-05-17T11:00:00+01:00",
+      "consumption_kwh": 0.111,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T11:00:00+01:00",
+      "interval_end": "2026-05-17T11:30:00+01:00",
+      "consumption_kwh": 0.109,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T11:30:00+01:00",
+      "interval_end": "2026-05-17T12:00:00+01:00",
+      "consumption_kwh": 1.22,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T12:00:00+01:00",
+      "interval_end": "2026-05-17T12:30:00+01:00",
+      "consumption_kwh": 1.724,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T12:30:00+01:00",
+      "interval_end": "2026-05-17T13:00:00+01:00",
+      "consumption_kwh": 0.59,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T13:00:00+01:00",
+      "interval_end": "2026-05-17T13:30:00+01:00",
+      "consumption_kwh": 0.479,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T13:30:00+01:00",
+      "interval_end": "2026-05-17T14:00:00+01:00",
+      "consumption_kwh": 2.192,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T14:00:00+01:00",
+      "interval_end": "2026-05-17T14:30:00+01:00",
+      "consumption_kwh": 1.608,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T14:30:00+01:00",
+      "interval_end": "2026-05-17T15:00:00+01:00",
+      "consumption_kwh": 0.2,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T15:00:00+01:00",
+      "interval_end": "2026-05-17T15:30:00+01:00",
+      "consumption_kwh": 0.117,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T15:30:00+01:00",
+      "interval_end": "2026-05-17T16:00:00+01:00",
+      "consumption_kwh": 0.113,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T16:00:00+01:00",
+      "interval_end": "2026-05-17T16:30:00+01:00",
+      "consumption_kwh": 0.111,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T16:30:00+01:00",
+      "interval_end": "2026-05-17T17:00:00+01:00",
+      "consumption_kwh": 0.116,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T17:00:00+01:00",
+      "interval_end": "2026-05-17T17:30:00+01:00",
+      "consumption_kwh": 0.113,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T17:30:00+01:00",
+      "interval_end": "2026-05-17T18:00:00+01:00",
+      "consumption_kwh": 0.124,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T18:00:00+01:00",
+      "interval_end": "2026-05-17T18:30:00+01:00",
+      "consumption_kwh": 0.934,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T18:30:00+01:00",
+      "interval_end": "2026-05-17T19:00:00+01:00",
+      "consumption_kwh": 2.032,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    },
+    {
+      "interval_start": "2026-05-17T19:00:00+01:00",
+      "interval_end": "2026-05-17T19:30:00+01:00",
+      "consumption_kwh": 1.303,
+      "mpan": "2000005457590",
+      "meter_serial": "23E5031404",
+      "collected_at": "2026-06-15T17:17:31+01:00"
+    }
+  ]
 }
