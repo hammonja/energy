@@ -30,6 +30,7 @@ COLLECTOR_STATE = {
     "last_error": None,
     "last_comparison_error": None,
     "last_consumption_error": None,
+    "last_consumption_query": None,
     "last_attempt": None,
     "account_linked": False,
     "active_tariff": None,
@@ -465,7 +466,9 @@ INDEX_HTML = """<!doctype html>
         } else if (payload.status && payload.status.last_consumption_error) {
           setStatus(`${els.status.textContent} Consumption unavailable: ${payload.status.last_consumption_error}`, "warn");
         } else if ((payload.consumption || []).length === 0 && payload.status && payload.status.active_tariff && payload.status.active_tariff.meter_serial) {
-          setStatus(`${els.status.textContent} No consumption data returned by Octopus yet for meter ${payload.status.active_tariff.meter_serial}.`, "warn");
+          const query = payload.status.last_consumption_query || {};
+          const windowText = query.period_from && query.period_to ? ` from ${formatTime(query.period_from)} to ${formatTime(query.period_to)}` : "";
+          setStatus(`${els.status.textContent} No consumption data returned by Octopus yet for MPAN ${query.mpan || payload.status.active_tariff.mpan || "--"} meter ${query.meter_serial || payload.status.active_tariff.meter_serial}${windowText}.`, "warn");
         } else if (payload.status && payload.status.last_comparison_error) {
           setStatus(`${els.status.textContent} Some comparison tariffs could not be read: ${payload.status.last_comparison_error}`, "warn");
         }
@@ -879,17 +882,32 @@ def fetch_consumption_for_tariff(tariff, api_key):
     mpan = tariff.get("mpan")
     meter_serial = tariff.get("meter_serial")
     if not mpan or not meter_serial or not api_key:
+        COLLECTOR_STATE["last_consumption_query"] = {
+            "mpan": mpan,
+            "meter_serial": meter_serial,
+            "period_from": None,
+            "period_to": None,
+            "rows": 0,
+        }
         return []
 
     now = utc_now()
     period_from = (now - timedelta(days=31)).isoformat().replace("+00:00", "Z")
-    period_to = (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z")
+    period_to = now.isoformat().replace("+00:00", "Z")
     data = octopus_get(
         consumption_url(mpan, meter_serial),
         api_key=api_key,
         params={"period_from": period_from, "period_to": period_to, "order_by": "period"},
     )
-    return [consumption_sample(tariff, row) for row in data.get("results", []) if row.get("consumption") is not None]
+    rows = data.get("results", [])
+    COLLECTOR_STATE["last_consumption_query"] = {
+        "mpan": mpan,
+        "meter_serial": meter_serial,
+        "period_from": period_from,
+        "period_to": period_to,
+        "rows": len(rows),
+    }
+    return [consumption_sample(tariff, row) for row in rows if row.get("consumption") is not None]
 
 
 def fetch_current_price():
@@ -930,6 +948,13 @@ def fetch_all_current_prices(config=None):
     except Exception as exc:
         consumption = []
         COLLECTOR_STATE["last_consumption_error"] = str(exc)
+        COLLECTOR_STATE["last_consumption_query"] = {
+            "mpan": active_tariff.get("mpan"),
+            "meter_serial": active_tariff.get("meter_serial"),
+            "period_from": None,
+            "period_to": None,
+            "rows": 0,
+        }
 
     return active_samples[0], samples, consumption
 
