@@ -444,8 +444,8 @@ INDEX_HTML = """<!doctype html>
 
       setStatus(
         samples.length
-          ? `Showing ${samples.length.toLocaleString()} sample${samples.length === 1 ? "" : "s"}. Drag to zoom, double-click to reset, scroll to zoom.`
-          : "No samples in this range yet."
+          ? `Showing ${samples.length.toLocaleString()} price sample${samples.length === 1 ? "" : "s"} and ${consumption.length.toLocaleString()} usage chunk${consumption.length === 1 ? "" : "s"}. Drag to zoom, double-click to reset, scroll to zoom.`
+          : "No price samples in this range yet."
       );
     }
 
@@ -464,6 +464,8 @@ INDEX_HTML = """<!doctype html>
           setStatus(`${els.status.textContent} Last collector error: ${payload.status.last_error}`, "error");
         } else if (payload.status && payload.status.last_consumption_error) {
           setStatus(`${els.status.textContent} Consumption unavailable: ${payload.status.last_consumption_error}`, "warn");
+        } else if ((payload.consumption || []).length === 0 && payload.status && payload.status.active_tariff && payload.status.active_tariff.meter_serial) {
+          setStatus(`${els.status.textContent} No consumption data returned by Octopus yet for meter ${payload.status.active_tariff.meter_serial}.`, "warn");
         } else if (payload.status && payload.status.last_comparison_error) {
           setStatus(`${els.status.textContent} Some comparison tariffs could not be read: ${payload.status.last_comparison_error}`, "warn");
         }
