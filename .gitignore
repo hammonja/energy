@@ -1,1 +1,4 @@
 octopus_config.json
+energy.db
+__pycache__/
+*.pyc

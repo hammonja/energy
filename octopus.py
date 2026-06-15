@@ -1,5 +1,6 @@
 import json
 import os
+import sqlite3
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -18,6 +19,8 @@ DEFAULT_PRICE_URL = os.environ.get(
 )
 API_BASE = "https://api.octopus.energy/v1"
 DATA_FILE = Path(os.environ.get("OCTOPUS_DATA_FILE", "octopus_prices.json"))
+APP_DIR = Path(__file__).resolve().parent
+DB_FILE = Path(os.environ.get("OCTOPUS_DB_FILE", APP_DIR / "energy.db"))
 CONFIG_FILE = Path(os.environ.get("OCTOPUS_CONFIG_FILE", "octopus_config.json"))
 POLL_SECONDS = int(os.environ.get("OCTOPUS_POLL_SECONDS", "300"))
 HOST = os.environ.get("OCTOPUS_HOST", "127.0.0.1")
@@ -590,11 +593,15 @@ def write_samples(samples, source_url, active_tariff, consumption=None):
 
 def load_config():
     with CONFIG_LOCK:
-        config = read_json_file(CONFIG_FILE, {})
+        init_config_db()
+        with sqlite3.connect(DB_FILE) as conn:
+            row = conn.execute(
+                "SELECT account_id, api_key FROM account_config LIMIT 1"
+            ).fetchone()
 
     return {
-        "account_number": str(config.get("account_number", "")).strip(),
-        "api_key": str(config.get("api_key", "")).strip(),
+        "account_number": str(row[0] if row else "").strip(),
+        "api_key": str(row[1] if row else "").strip(),
     }
 
 
@@ -603,21 +610,46 @@ def public_config(config=None):
     return {
         "account_number": config.get("account_number", ""),
         "has_api_key": bool(config.get("api_key")),
-        "config_file": str(CONFIG_FILE),
+        "config_db": str(DB_FILE),
     }
+
+
+def init_config_db():
+    DB_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS account_config (
+                account_id TEXT NOT NULL,
+                api_key TEXT NOT NULL
+            )
+            """
+        )
+        count = conn.execute("SELECT COUNT(*) FROM account_config").fetchone()[0]
+        if count == 0 and CONFIG_FILE.exists():
+            legacy = read_json_file(CONFIG_FILE, {})
+            account_id = str(legacy.get("account_number", "")).strip()
+            api_key = str(legacy.get("api_key", "")).strip()
+            if account_id and api_key:
+                conn.execute(
+                    "INSERT INTO account_config (account_id, api_key) VALUES (?, ?)",
+                    (account_id, api_key),
+                )
 
 
 def save_config(config):
     cleaned = {
         "account_number": config.get("account_number", "").strip(),
         "api_key": config.get("api_key", "").strip(),
-        "updated_at": local_now_iso(),
     }
-    temp_file = CONFIG_FILE.with_suffix(CONFIG_FILE.suffix + ".tmp")
     with CONFIG_LOCK:
-        with temp_file.open("w", encoding="utf-8") as file:
-            json.dump(cleaned, file, indent=2)
-        temp_file.replace(CONFIG_FILE)
+        init_config_db()
+        with sqlite3.connect(DB_FILE) as conn:
+            conn.execute("DELETE FROM account_config")
+            conn.execute(
+                "INSERT INTO account_config (account_id, api_key) VALUES (?, ?)",
+                (cleaned["account_number"], cleaned["api_key"]),
+            )
     return cleaned
 
 
@@ -1164,11 +1196,11 @@ class OctopusHandler(BaseHTTPRequestHandler):
 
 def main():
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    init_config_db()
     server = ThreadingHTTPServer((HOST, PORT), OctopusHandler)
     print(f"Serving Octopus price tracker at http://{HOST}:{PORT}/", flush=True)
     print(f"Writing samples to {DATA_FILE.resolve()}", flush=True)
-    print(f"Reading account config from {CONFIG_FILE.resolve()}", flush=True)
+    print(f"Reading account config from {DB_FILE.resolve()}", flush=True)
 
     collector = threading.Thread(target=collector_loop, daemon=True)
     collector.start()

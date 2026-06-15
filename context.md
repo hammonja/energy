@@ -7,7 +7,8 @@ The app is intended to run on a Raspberry Pi or similar always-on machine. The u
 ## Main Files
 
 - `octopus.py`: Python HTTP server, background collector, Octopus API integration, embedded HTML/CSS/JavaScript frontend.
-- `octopus_config.json`: Stores the linked Octopus account number and API key.
+- `energy.db`: SQLite database storing the linked Octopus account ID and API key in `account_config`.
+- `octopus_config.json`: Legacy config file. The app can migrate from it if `energy.db` is empty, but current config reads/writes use SQLite.
 - `octopus_prices.json`: Stores collected price samples and smart-meter consumption chunks.
 - `.gitignore`: Open in the IDE during this work, but not central to the app behaviour.
 
@@ -28,6 +29,14 @@ The app is intended to run on a Raspberry Pi or similar always-on machine. The u
 - Shows clear status text for price samples and usage chunks.
 
 ## Important Behaviour
+
+Account config is stored in `energy.db`, next to `octopus.py`.
+
+The config table is:
+
+- `account_config(account_id TEXT NOT NULL, api_key TEXT NOT NULL)`
+
+The app keeps this as a single-row table and maps `account_id` to the existing UI field called `account_number`.
 
 Price data and consumption data are stored separately in `octopus_prices.json`:
 
@@ -94,7 +103,7 @@ The app discovers all meter serials returned for the MPAN and tries each serial 
 
 Observed during development:
 
-- Account number: stored in `octopus_config.json`.
+- Account number/account ID: stored in `energy.db`.
 - MPAN seen in app data: `2000005457590`.
 - Meter serial seen in UI/status: `Z14N131482`.
 - Product: Intelligent Octopus Go.
@@ -114,7 +123,7 @@ A PowerShell rewrite briefly introduced a UTF-8 BOM, causing:
 This was fixed by:
 
 - Changing JSON reads to `encoding="utf-8-sig"`.
-- Rewriting `octopus_prices.json` and `octopus_config.json` without the BOM.
+- Rewriting `octopus_prices.json` and the legacy `octopus_config.json` without the BOM.
 
 ## Current Verification
 
@@ -132,4 +141,3 @@ Potential next improvements:
 - Add pruning/retention settings for `octopus_prices.json`.
 - Split embedded HTML out of `octopus.py` if the frontend grows.
 - Add a small `/api/debug/consumption` endpoint to expose the latest query metadata directly.
-
