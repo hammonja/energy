@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-15T12:18:13.316886Z",
+  "updated_at": "2026-06-15T12:47:09.491833Z",
   "source_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-H/standard-unit-rates/",
   "poll_seconds": 300,
   "active_tariff": {
@@ -166,6 +166,40 @@
     },
     {
       "collected_at": "2026-06-15T12:18:13.316438Z",
+      "value_inc_vat": 30.371355,
+      "value_exc_vat": 28.9251,
+      "valid_from": "2026-06-15T04:30:00Z",
+      "valid_to": "2026-06-15T22:30:00Z",
+      "payment_method": null,
+      "account_number": "A-48780D75",
+      "account_linked": true,
+      "mpan": "2000005457590",
+      "product_code": "INTELLI-VAR-24-10-29",
+      "product_name": "Intelligent Octopus Go",
+      "product_full_name": "Intelligent Octopus Go",
+      "tariff_code": "E-1R-INTELLI-VAR-24-10-29-H",
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/INTELLI-VAR-24-10-29/electricity-tariffs/E-1R-INTELLI-VAR-24-10-29-H/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T12:45:53.448858Z",
+      "value_inc_vat": 16.905,
+      "value_exc_vat": 16.1,
+      "valid_from": "2026-06-15T12:30:00Z",
+      "valid_to": "2026-06-15T13:00:00Z",
+      "payment_method": null,
+      "account_number": null,
+      "account_linked": false,
+      "mpan": null,
+      "product_code": "AGILE-24-10-01",
+      "product_name": "Agile Octopus",
+      "product_full_name": null,
+      "tariff_code": "E-1R-AGILE-24-10-01-L",
+      "rate_name": "standard",
+      "price_url": "https://api.octopus.energy/v1/products/AGILE-24-10-01/electricity-tariffs/E-1R-AGILE-24-10-01-L/standard-unit-rates/"
+    },
+    {
+      "collected_at": "2026-06-15T12:47:09.490994Z",
       "value_inc_vat": 30.371355,
       "value_exc_vat": 28.9251,
       "valid_from": "2026-06-15T04:30:00Z",
