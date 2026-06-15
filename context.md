@@ -8,8 +8,10 @@ The app is intended to run on a Raspberry Pi or similar always-on machine. The u
 
 - `octopus.py`: Python HTTP server, background collector, Octopus API integration, embedded HTML/CSS/JavaScript frontend.
 - `energy.db`: SQLite database storing the linked Octopus account ID and API key in `account_config`.
+- `energy_seed.sql`: Ignored deployment seed script from an earlier migration. It contains the API key if regenerated from the live DB, so keep it private.
+- `energy_schema_reset.sql`: Ignored schema reset script. It drops and recreates empty SQLite tables using the current lean schema.
 - `octopus_config.json`: Legacy config file. The app can migrate from it if `energy.db` is empty, but current config reads/writes use SQLite.
-- `octopus_prices.json`: Stores collected price samples and smart-meter consumption chunks.
+- `octopus_prices.json`: Stores collected price samples.
 - `.gitignore`: Open in the IDE during this work, but not central to the app behaviour.
 
 ## Current Features
@@ -34,16 +36,23 @@ Account config is stored in `energy.db`, next to `octopus.py`.
 
 The config table is:
 
-- `account_config(account_id TEXT NOT NULL, api_key TEXT NOT NULL)`
+- `account_config(account_id TEXT NOT NULL, api_key TEXT NOT NULL, mpan TEXT, meter_serial TEXT)`
 
-The app keeps this as a single-row table and maps `account_id` to the existing UI field called `account_number`.
+The app keeps this as a single-row table and maps `account_id` to the existing UI field called `account_number`. Because this installation has a single MPAN and meter serial, `mpan` and `meter_serial` are stored once here rather than repeated on every consumption row.
 
-Price data and consumption data are stored separately in `octopus_prices.json`:
+Price data remains in `octopus_prices.json`:
 
 - `samples`: tariff price samples.
-- `consumption`: actual consumption chunks.
 
-Consumption is not live. Octopus usually publishes smart-meter consumption after a delay. The app requests a rolling 31-day window and merges readings by MPAN, meter serial, interval start, and interval end.
+Actual consumption is stored in `energy.db`.
+
+The consumption table is:
+
+- `consumption_readings(interval_start TEXT, interval_end TEXT, consumption_kwh REAL, collected_at TEXT)`
+
+The primary key is `(interval_start, interval_end)`, so repeated collector runs upsert delayed or refreshed Octopus usage data without duplicating rows.
+
+Consumption is not live. Octopus usually publishes smart-meter consumption after a delay. The app requests a rolling 31-day window and stores readings by MPAN, meter serial, interval start, and interval end.
 
 The consumption endpoint is paginated. The app follows Octopus `next` links and also requests a large `page_size`, so it should pull the full available 31-day window rather than only the first page.
 

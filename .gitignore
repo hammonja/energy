@@ -1,4 +1,6 @@
 octopus_config.json
 energy.db
+energy_seed.sql
+energy_schema_reset.sql
 __pycache__/
 *.pyc

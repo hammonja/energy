@@ -568,12 +568,27 @@ def read_samples():
 
 
 def read_consumption():
+    init_config_db()
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT interval_start, interval_end, consumption_kwh, collected_at
+            FROM consumption_readings
+            ORDER BY interval_start
+            """
+        ).fetchall()
+
+    return [dict(row) for row in rows]
+
+
+def read_legacy_consumption():
     data = read_json_file(DATA_FILE, [])
 
-    if isinstance(data, list):
-        return []
+    if isinstance(data, dict):
+        return data.get("consumption", [])
 
-    return data.get("consumption", [])
+    return []
 
 
 def write_samples(samples, source_url, active_tariff, consumption=None):
@@ -583,7 +598,6 @@ def write_samples(samples, source_url, active_tariff, consumption=None):
         "poll_seconds": POLL_SECONDS,
         "active_tariff": active_tariff,
         "samples": samples,
-        "consumption": consumption if consumption is not None else read_consumption(),
     }
     temp_file = DATA_FILE.with_suffix(DATA_FILE.suffix + ".tmp")
     with temp_file.open("w", encoding="utf-8") as file:
@@ -596,12 +610,14 @@ def load_config():
         init_config_db()
         with sqlite3.connect(DB_FILE) as conn:
             row = conn.execute(
-                "SELECT account_id, api_key FROM account_config LIMIT 1"
+                "SELECT account_id, api_key, mpan, meter_serial FROM account_config LIMIT 1"
             ).fetchone()
 
     return {
         "account_number": str(row[0] if row else "").strip(),
         "api_key": str(row[1] if row else "").strip(),
+        "mpan": str(row[2] if row and row[2] else "").strip(),
+        "meter_serial": str(row[3] if row and row[3] else "").strip(),
     }
 
 
@@ -621,8 +637,34 @@ def init_config_db():
             """
             CREATE TABLE IF NOT EXISTS account_config (
                 account_id TEXT NOT NULL,
-                api_key TEXT NOT NULL
+                api_key TEXT NOT NULL,
+                mpan TEXT,
+                meter_serial TEXT
             )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS consumption_readings (
+                interval_start TEXT NOT NULL,
+                interval_end TEXT NOT NULL,
+                consumption_kwh REAL NOT NULL,
+                collected_at TEXT,
+                PRIMARY KEY (interval_start, interval_end)
+            )
+            """
+        )
+        account_columns = {
+            row[1] for row in conn.execute("PRAGMA table_info(account_config)").fetchall()
+        }
+        if "mpan" not in account_columns:
+            conn.execute("ALTER TABLE account_config ADD COLUMN mpan TEXT")
+        if "meter_serial" not in account_columns:
+            conn.execute("ALTER TABLE account_config ADD COLUMN meter_serial TEXT")
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_consumption_interval_start
+            ON consumption_readings (interval_start)
             """
         )
         count = conn.execute("SELECT COUNT(*) FROM account_config").fetchone()[0]
@@ -636,19 +678,61 @@ def init_config_db():
                     (account_id, api_key),
                 )
 
+        consumption_count = conn.execute("SELECT COUNT(*) FROM consumption_readings").fetchone()[0]
+        if consumption_count == 0:
+            upsert_consumption_rows(conn, read_legacy_consumption())
+
+
+def upsert_consumption_rows(conn, rows):
+    for row in rows:
+        interval_start = row.get("interval_start")
+        interval_end = row.get("interval_end")
+        consumption_kwh = row.get("consumption_kwh")
+        if not all([interval_start, interval_end]) or consumption_kwh is None:
+            continue
+
+        conn.execute(
+            """
+            INSERT INTO consumption_readings (
+                interval_start, interval_end, consumption_kwh, collected_at
+            )
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(interval_start, interval_end)
+            DO UPDATE SET
+                consumption_kwh = excluded.consumption_kwh,
+                collected_at = excluded.collected_at
+            """,
+            (
+                str(interval_start),
+                str(interval_end),
+                float(consumption_kwh),
+                row.get("collected_at"),
+            ),
+        )
+
 
 def save_config(config):
     cleaned = {
         "account_number": config.get("account_number", "").strip(),
         "api_key": config.get("api_key", "").strip(),
+        "mpan": config.get("mpan", "").strip(),
+        "meter_serial": config.get("meter_serial", "").strip(),
     }
     with CONFIG_LOCK:
         init_config_db()
         with sqlite3.connect(DB_FILE) as conn:
             conn.execute("DELETE FROM account_config")
             conn.execute(
-                "INSERT INTO account_config (account_id, api_key) VALUES (?, ?)",
-                (cleaned["account_number"], cleaned["api_key"]),
+                """
+                INSERT INTO account_config (account_id, api_key, mpan, meter_serial)
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    cleaned["account_number"],
+                    cleaned["api_key"],
+                    cleaned["mpan"],
+                    cleaned["meter_serial"],
+                ),
             )
     return cleaned
 
@@ -922,8 +1006,6 @@ def consumption_sample(tariff, row):
         "interval_start": interval_start,
         "interval_end": interval_end,
         "consumption_kwh": float(row["consumption"]),
-        "mpan": tariff.get("mpan"),
-        "meter_serial": tariff.get("meter_serial"),
         "collected_at": local_now_iso(),
     }
 
@@ -936,15 +1018,10 @@ def consumption_period():
     )
 
 
-def merge_consumption(existing, incoming):
-    merged = {}
-    for row in existing + incoming:
-        key = (row.get("mpan"), row.get("meter_serial"), row.get("interval_start"), row.get("interval_end"))
-        merged[key] = row
-    return sorted(
-        merged.values(),
-        key=lambda row: parse_octopus_time(row["interval_start"]) if row.get("interval_start") else datetime.min.replace(tzinfo=timezone.utc),
-    )
+def save_consumption(rows):
+    init_config_db()
+    with sqlite3.connect(DB_FILE) as conn:
+        upsert_consumption_rows(conn, rows)
 
 
 def fetch_consumption_for_tariff(tariff, api_key):
@@ -1059,8 +1136,8 @@ def collect_once():
         samples = read_samples()
         samples.extend(batch)
         samples.sort(key=lambda point: parse_octopus_time(point["collected_at"]))
-        consumption = merge_consumption(read_consumption(), consumption_batch)
-        write_samples(samples, sample["price_url"], COLLECTOR_STATE["active_tariff"], consumption)
+        write_samples(samples, sample["price_url"], COLLECTOR_STATE["active_tariff"])
+    save_consumption(consumption_batch)
 
     COLLECTOR_STATE["last_ok"] = sample["collected_at"]
     COLLECTOR_STATE["last_error"] = None
@@ -1153,8 +1230,15 @@ class OctopusHandler(BaseHTTPRequestHandler):
                     raise ValueError("Account number and API key are required")
 
                 pending_config = {"account_number": account_number, "api_key": api_key}
-                resolve_account_tariff(pending_config)
-                config = save_config({"account_number": account_number, "api_key": api_key})
+                tariff = resolve_account_tariff(pending_config)
+                config = save_config(
+                    {
+                        "account_number": account_number,
+                        "api_key": api_key,
+                        "mpan": tariff.get("mpan") or "",
+                        "meter_serial": tariff.get("meter_serial") or "",
+                    }
+                )
                 sample = collect_once()
                 with DATA_LOCK:
                     samples = read_samples()
