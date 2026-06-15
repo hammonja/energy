@@ -370,7 +370,6 @@ INDEX_HTML = """<!doctype html>
         xaxis: {
           title: "Collected at",
           gridcolor: rootStyle.getPropertyValue("--line").trim(),
-          rangeslider: { visible: true, thickness: 0.12 },
           rangeselector: {
             buttons: [
               { count: 30, label: "30m", step: "minute", stepmode: "backward" },
@@ -634,6 +633,19 @@ def fetch_product_summary(product_code):
     }
 
 
+def walk_tariff_entries(value):
+    if isinstance(value, dict):
+        code = value.get("code")
+        if isinstance(code, str) and code.startswith(("E-1R-", "E-2R-")):
+            yield code, value
+
+        for child in value.values():
+            yield from walk_tariff_entries(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk_tariff_entries(child)
+
+
 def product_electricity_tariffs(product_code):
     product = fetch_product_detail(product_code)
     product_name = product.get("display_name") or product.get("full_name") or product_code
@@ -651,10 +663,7 @@ def product_electricity_tariffs(product_code):
         if not isinstance(group, dict):
             continue
 
-        for tariff_code, tariff_data in group.items():
-            if not isinstance(tariff_data, dict):
-                tariff_data = {}
-
+        for tariff_code, tariff_data in walk_tariff_entries(group):
             tariffs[tariff_code] = {
                 "account_number": None,
                 "account_linked": False,
