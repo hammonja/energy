@@ -28,6 +28,7 @@ CONFIG_LOCK = threading.Lock()
 COLLECTOR_STATE = {
     "last_ok": None,
     "last_error": None,
+    "last_comparison_error": None,
     "last_attempt": None,
     "account_linked": False,
     "active_tariff": None,
@@ -242,11 +243,11 @@ INDEX_HTML = """<!doctype html>
 
     <div class="toolbar" aria-label="Chart range">
       <button type="button" data-range="30m">30 min</button>
-      <button type="button" data-range="6h" class="active">6 hours</button>
+      <button type="button" data-range="6h">6 hours</button>
       <button type="button" data-range="1d">Day</button>
       <button type="button" data-range="1w">Week</button>
       <button type="button" data-range="1mo">Month</button>
-      <button type="button" data-range="all">All</button>
+      <button type="button" data-range="all" class="active">All</button>
     </div>
     <div id="chart"></div>
     <div id="status" class="status">Loading data...</div>
@@ -262,7 +263,8 @@ INDEX_HTML = """<!doctype html>
     };
 
     let allSamples = [];
-    let activeRange = "6h";
+    let latestStatus = {};
+    let activeRange = "all";
 
     const els = {
       chart: document.getElementById("chart"),
@@ -309,7 +311,11 @@ INDEX_HTML = """<!doctype html>
     }
 
     function updateSummary(status) {
-      const latest = allSamples.at(-1);
+      const activeTariffCode = status.active_tariff && status.active_tariff.tariff_code;
+      const accountSamples = activeTariffCode
+        ? allSamples.filter(point => point.tariff_code === activeTariffCode)
+        : allSamples.filter(point => point.account_linked);
+      const latest = (accountSamples.length ? accountSamples : allSamples).at(-1);
       els.currentPrice.textContent = latest ? `${latest.value_inc_vat.toFixed(2)} p/kWh` : "--";
       els.latestSample.textContent = latest ? formatTime(latest.collected_at) : "--";
       els.sampleCount.textContent = allSamples.length.toLocaleString();
@@ -319,22 +325,41 @@ INDEX_HTML = """<!doctype html>
 
     function drawChart() {
       const samples = rangeSamples();
-      const x = samples.map(point => point.collected_at);
-      const y = samples.map(point => point.value_inc_vat);
-      const tariffCodes = samples.map(point => point.tariff_code || "");
-      const products = samples.map(point => point.product_name || point.product_code || "");
+      const activeTariffCode = latestStatus.active_tariff && latestStatus.active_tariff.tariff_code;
+      const groups = new Map();
+      for (const point of samples) {
+        const key = `${point.tariff_code || "unknown"}::${point.rate_name || "standard"}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(point);
+      }
 
-      const trace = {
-        x,
-        y,
-        customdata: samples.map((point, index) => [tariffCodes[index], products[index], point.rate_name || "standard"]),
-        type: "scatter",
-        mode: "lines+markers",
-        name: "Price inc VAT",
-        line: { color: "#0078a8", width: 2 },
-        marker: { color: "#0078a8", size: 6 },
-        hovertemplate: "%{x|%d %b %Y %H:%M}<br>%{y:.2f} p/kWh<br>%{customdata[1]}<br>%{customdata[0]}<extra></extra>"
-      };
+      const traces = Array.from(groups.entries()).map(([key, points]) => {
+        const first = points[0] || {};
+        const isActive = first.tariff_code === activeTariffCode || first.account_linked;
+        const colour = isActive ? "#0078a8" : "#8b949e";
+        const label = [
+          first.account_linked ? "Linked account" : "Comparison tariff",
+          first.tariff_code || "Unknown tariff",
+          first.rate_name || "standard"
+        ].join(" - ");
+
+        return {
+          x: points.map(point => new Date(point.collected_at)),
+          y: points.map(point => point.value_inc_vat),
+          customdata: points.map(point => [
+            point.tariff_code || "",
+            point.product_name || point.product_code || "",
+            point.rate_name || "standard"
+          ]),
+          type: "scatter",
+          mode: "lines+markers",
+          name: label,
+          line: { color: colour, width: isActive ? 3 : 1.4 },
+          marker: { color: colour, size: isActive ? 7 : 4 },
+          opacity: isActive ? 1 : 0.55,
+          hovertemplate: "%{x|%d %b %Y %H:%M}<br>%{y:.2f} p/kWh<br>%{customdata[1]}<br>%{customdata[0]}<br>%{customdata[2]}<extra></extra>"
+        };
+      });
 
       const rootStyle = getComputedStyle(document.documentElement);
       const layout = {
@@ -363,10 +388,11 @@ INDEX_HTML = """<!doctype html>
           gridcolor: rootStyle.getPropertyValue("--line").trim()
         },
         hovermode: "x unified",
-        showlegend: false
+        showlegend: true,
+        legend: { orientation: "h", y: -0.25 }
       };
 
-      Plotly.react(els.chart, [trace], layout, {
+      Plotly.react(els.chart, traces, layout, {
         responsive: true,
         displaylogo: false,
         scrollZoom: true,
@@ -386,11 +412,14 @@ INDEX_HTML = """<!doctype html>
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const payload = await response.json();
         allSamples = payload.samples || [];
+        latestStatus = payload.status || {};
         updateAccount(payload.config || {}, payload.status || {});
         updateSummary(payload.status || {});
         drawChart();
         if (payload.status && payload.status.last_error) {
           setStatus(`${els.status.textContent} Last collector error: ${payload.status.last_error}`, "error");
+        } else if (payload.status && payload.status.last_comparison_error) {
+          setStatus(`${els.status.textContent} Some comparison tariffs could not be read: ${payload.status.last_comparison_error}`, "warn");
         }
       } catch (error) {
         setStatus(`Could not load price data: ${error.message}`, "error");
@@ -415,6 +444,7 @@ INDEX_HTML = """<!doctype html>
         if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
         els.apiKey.value = "";
         allSamples = payload.samples || allSamples;
+        latestStatus = payload.status || latestStatus;
         updateAccount(payload.config || {}, payload.status || {});
         updateSummary(payload.status || {});
         drawChart();
@@ -450,6 +480,14 @@ def utc_now_iso():
     return utc_now().isoformat().replace("+00:00", "Z")
 
 
+def local_now():
+    return datetime.now().astimezone()
+
+
+def local_now_iso():
+    return local_now().isoformat(timespec="seconds")
+
+
 def parse_octopus_time(value):
     if not value:
         return None
@@ -475,7 +513,7 @@ def read_samples():
 
 def write_samples(samples, source_url, active_tariff):
     payload = {
-        "updated_at": utc_now_iso(),
+        "updated_at": local_now_iso(),
         "source_url": source_url,
         "poll_seconds": POLL_SECONDS,
         "active_tariff": active_tariff,
@@ -510,7 +548,7 @@ def save_config(config):
     cleaned = {
         "account_number": config.get("account_number", "").strip(),
         "api_key": config.get("api_key", "").strip(),
-        "updated_at": utc_now_iso(),
+        "updated_at": local_now_iso(),
     }
     temp_file = CONFIG_FILE.with_suffix(CONFIG_FILE.suffix + ".tmp")
     with CONFIG_LOCK:
@@ -579,17 +617,56 @@ def price_url(product_code, tariff_code, endpoint):
     return f"{API_BASE}/products/{product_code}/electricity-tariffs/{tariff_code}/{endpoint}/"
 
 
-def fetch_product_summary(product_code):
+def fetch_product_detail(product_code):
     try:
-        product = octopus_get(f"{API_BASE}/products/{product_code}/")
+        return octopus_get(f"{API_BASE}/products/{product_code}/")
     except requests.HTTPError:
-        return {"product_code": product_code, "product_name": product_code}
+        return {"code": product_code, "display_name": product_code}
+
+
+def fetch_product_summary(product_code):
+    product = fetch_product_detail(product_code)
 
     return {
         "product_code": product_code,
         "product_name": product.get("display_name") or product.get("full_name") or product_code,
         "product_full_name": product.get("full_name"),
     }
+
+
+def product_electricity_tariffs(product_code):
+    product = fetch_product_detail(product_code)
+    product_name = product.get("display_name") or product.get("full_name") or product_code
+    product_full_name = product.get("full_name")
+    tariff_groups = (
+        "single_register_electricity_tariffs",
+        "dual_register_electricity_tariffs",
+        "single_register_business_electricity_tariffs",
+        "dual_register_business_electricity_tariffs",
+    )
+    tariffs = {}
+
+    for group_name in tariff_groups:
+        group = product.get(group_name)
+        if not isinstance(group, dict):
+            continue
+
+        for tariff_code, tariff_data in group.items():
+            if not isinstance(tariff_data, dict):
+                tariff_data = {}
+
+            tariffs[tariff_code] = {
+                "account_number": None,
+                "account_linked": False,
+                "product_code": product_code,
+                "product_name": product_name,
+                "product_full_name": product_full_name,
+                "tariff_code": tariff_code,
+                "tariff_display_name": tariff_data.get("display_name") or tariff_data.get("description"),
+                "mpan": None,
+            }
+
+    return list(tariffs.values())
 
 
 def fallback_tariff():
@@ -635,16 +712,36 @@ def resolve_account_tariff(config=None):
     }
 
 
-def fetch_current_price_for_tariff(tariff):
+def current_rate_sample(tariff, rate_name, url, rate):
+    return {
+        "collected_at": local_now_iso(),
+        "value_inc_vat": float(rate["value_inc_vat"]),
+        "value_exc_vat": float(rate["value_exc_vat"]),
+        "valid_from": rate["valid_from"],
+        "valid_to": rate["valid_to"],
+        "payment_method": rate.get("payment_method"),
+        "account_number": tariff.get("account_number"),
+        "account_linked": tariff.get("account_linked", False),
+        "mpan": tariff.get("mpan"),
+        "product_code": tariff.get("product_code"),
+        "product_name": tariff.get("product_name"),
+        "product_full_name": tariff.get("product_full_name"),
+        "tariff_code": tariff.get("tariff_code"),
+        "tariff_display_name": tariff.get("tariff_display_name"),
+        "rate_name": rate_name,
+        "price_url": url,
+    }
+
+
+def fetch_current_prices_for_tariff(tariff):
     now = utc_now()
     period_from = (now - timedelta(hours=24)).isoformat().replace("+00:00", "Z")
     period_to = (now + timedelta(hours=24)).isoformat().replace("+00:00", "Z")
     last_error = None
+    samples = []
 
     for rate_name, endpoint in rate_endpoints_for_tariff(tariff["tariff_code"]):
         url = price_url(tariff["product_code"], tariff["tariff_code"], endpoint)
-        tariff["rate_name"] = rate_name
-        tariff["price_url"] = url
 
         try:
             data = octopus_get(url, params={"period_from": period_from, "period_to": period_to})
@@ -656,27 +753,19 @@ def fetch_current_price_for_tariff(tariff):
             start = parse_octopus_time(rate["valid_from"])
             end = parse_octopus_time(rate["valid_to"])
             if start and end and start <= now < end:
-                return {
-                    "collected_at": utc_now_iso(),
-                    "value_inc_vat": float(rate["value_inc_vat"]),
-                    "value_exc_vat": float(rate["value_exc_vat"]),
-                    "valid_from": rate["valid_from"],
-                    "valid_to": rate["valid_to"],
-                    "payment_method": rate.get("payment_method"),
-                    "account_number": tariff.get("account_number"),
-                    "account_linked": tariff.get("account_linked", False),
-                    "mpan": tariff.get("mpan"),
-                    "product_code": tariff.get("product_code"),
-                    "product_name": tariff.get("product_name"),
-                    "product_full_name": tariff.get("product_full_name"),
-                    "tariff_code": tariff.get("tariff_code"),
-                    "rate_name": rate_name,
-                    "price_url": url,
-                }
+                samples.append(current_rate_sample(tariff, rate_name, url, rate))
+                break
+
+    if samples:
+        return samples
 
     if last_error:
         raise last_error
     raise RuntimeError("Octopus response did not contain a current price window")
+
+
+def fetch_current_price_for_tariff(tariff):
+    return fetch_current_prices_for_tariff(tariff)[0]
 
 
 def fetch_current_price():
@@ -688,14 +777,39 @@ def fetch_current_price():
     return fetch_current_price_for_tariff(tariff)
 
 
+def fetch_all_current_prices():
+    active_tariff = resolve_account_tariff()
+    active_tariff["account_linked"] = active_tariff.get("account_linked", False)
+    COLLECTOR_STATE["account_linked"] = active_tariff.get("account_linked", False)
+    COLLECTOR_STATE["active_tariff"] = {
+        key: value for key, value in active_tariff.items() if key != "price_url"
+    }
+
+    active_samples = fetch_current_prices_for_tariff(active_tariff)
+    samples = list(active_samples)
+    comparison_errors = []
+
+    for tariff in product_electricity_tariffs(active_tariff["product_code"]):
+        if tariff["tariff_code"] == active_tariff["tariff_code"]:
+            continue
+
+        try:
+            samples.extend(fetch_current_prices_for_tariff(tariff))
+        except Exception as exc:
+            comparison_errors.append(f"{tariff['tariff_code']}: {exc}")
+
+    COLLECTOR_STATE["last_comparison_error"] = "; ".join(comparison_errors[:5]) if comparison_errors else None
+    return active_samples[0], samples
+
+
 def collect_once():
-    COLLECTOR_STATE["last_attempt"] = utc_now_iso()
-    sample = fetch_current_price()
+    COLLECTOR_STATE["last_attempt"] = local_now_iso()
+    sample, batch = fetch_all_current_prices()
 
     with DATA_LOCK:
         samples = read_samples()
-        samples.append(sample)
-        samples.sort(key=lambda point: point["collected_at"])
+        samples.extend(batch)
+        samples.sort(key=lambda point: parse_octopus_time(point["collected_at"]))
         write_samples(samples, sample["price_url"], COLLECTOR_STATE["active_tariff"])
 
     COLLECTOR_STATE["last_ok"] = sample["collected_at"]
