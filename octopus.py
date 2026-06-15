@@ -326,6 +326,16 @@ INDEX_HTML = """<!doctype html>
     function drawChart() {
       const samples = rangeSamples();
       const activeTariffCode = latestStatus.active_tariff && latestStatus.active_tariff.tariff_code;
+      const comparisonColours = [
+        "#c9d8ff",
+        "#cdeedc",
+        "#f6d4dc",
+        "#f8e1b8",
+        "#d9cff5",
+        "#bfe7ec",
+        "#ead6c7",
+        "#d7e8b4"
+      ];
       const groups = new Map();
       for (const point of samples) {
         const key = `${point.tariff_code || "unknown"}::${point.rate_name || "standard"}`;
@@ -333,10 +343,10 @@ INDEX_HTML = """<!doctype html>
         groups.get(key).push(point);
       }
 
-      const traces = Array.from(groups.entries()).map(([key, points]) => {
+      const traces = Array.from(groups.entries()).map(([key, points], index) => {
         const first = points[0] || {};
         const isActive = first.tariff_code === activeTariffCode || first.account_linked;
-        const colour = isActive ? "#0078a8" : "#8b949e";
+        const colour = isActive ? "#0078a8" : comparisonColours[index % comparisonColours.length];
         const label = [
           first.account_linked ? "Linked account" : "Comparison tariff",
           first.tariff_code || "Unknown tariff",
